@@ -1,0 +1,16 @@
+# Terraform
+**/.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+
+# Node
+node_modules/
+npm-debug.log
+
+# Playwright
+playwright-report/
+test-results/
+
+# OS
+.DS_Store
