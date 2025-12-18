@@ -69,13 +69,65 @@ This ensures:
 
 ---
 
+## Prerequisites
+
+Before running this demo, make sure you have the following installed:
+
+### **Manual (one-time setup per machine)**
+
+- **Docker Desktop**  
+  - Needed to run Playwright tests in a container.  
+  - Download: [https://www.docker.com/products/docker-desktop/](https://www.docker.com/products/docker-desktop/)
+
+- **Azure CLI**  
+  - Required for Terraform to provision and destroy Azure resources.  
+  - Install guide: [https://learn.microsoft.com/en-us/cli/azure/install-azure-cli](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli)  
+  - Login before using Terraform:
+
+  ```bash
+  az login
+  These steps are required only once per machine.
+
+- **Terraform**
+  - Terraform is required to provision and destroy Azure infrastructure.
+   #### Windows
+    1. Download Terraform from the official website:  
+    https://developer.hashicorp.com/terraform/downloads
+    2. Extract the binary and add it to your `PATH`.
+    3. Verify installation:
+    #```bash
+    terraform -version
+  
+  #### MacOs
+    brew tap hashicorp/tap
+    brew install hashicorp/tap/terraform
+    terraform -version
+
+  #### Linux
+    sudo apt-get update && sudo apt-get install -y gnupg software-properties-common
+    wget -O- https://apt.releases.hashicorp.com/gpg | \
+    gpg --dearmor | \
+    sudo tee /usr/share/keyrings/hashicorp-archive-keyring.gpg
+    echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] \
+    https://apt.releases.hashicorp.com $(lsb_release -cs) main" | \
+    sudo tee /etc/apt/sources.list.d/hashicorp.list
+    sudo apt-get update && sudo apt-get install terraform
+    terraform -version
+
+> In CI/CD pipelines, Terraform is executed directly by GitHub Actions runners, so no local installation is required when using the pipeline.
+
+
+### Automated (handled inside Docker)
+
+- **Node.js and Playwright**  
+  Already included in the Docker image, no local installation needed.
+
+- **Test dependencies**  
+  All npm packages are installed automatically when building the Docker image.
+
+---
+
 ## 🛠️ Running Locally
-
-### Requirements
-- Docker
-- Terraform
-- Azure CLI (optional, for testing locally)
-
 ### Steps
 1. Build and run the Playwright test container:
 #```bash

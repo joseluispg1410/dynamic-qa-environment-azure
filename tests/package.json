@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "description": "Automated tests for dynamic QA environment",
   "scripts": {
-    "test": "playwright test"  // Run all tests
+    "test": "playwright test"
   },
   "devDependencies": {
-    "@playwright/test": "^1.41.0" // Official Playwright test runner
+    "@playwright/test": "^1.41.0" 
   }
 }
