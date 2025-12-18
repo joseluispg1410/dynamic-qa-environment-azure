@@ -22,6 +22,15 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # Debug Workspace
+      - name: Debug workspace
+        run: |
+         echo "workspace=$GITHUB_WORKSPACE"
+         pwd
+         ls -la
+         ls -la ./terraform || true
+         find . -maxdepth 2 -name "*.tf" -print
+
       # Setup Terraform
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
@@ -30,7 +39,7 @@ jobs:
 
       # Initialize and apply Terraform to provision infra
       - name: Terraform Init & Apply
-        working-directory: terraform
+        working-directory: ./terraform
         run: |
           terraform init
           terraform apply -auto-approve
