@@ -1,11 +1,8 @@
-import { test, expect, request } from '@playwright/test';
+import { test, expect } from '@playwright/test';
 
-// Simple API health check
-test('Health endpoint is OK', async () => {
-  const context = await request.newContext({
-    baseURL: process.env.BASE_URL
-  });
+test('Desde la home puedo ir a /health', async ({ page }) => {
+  const response = await page.goto('/health');
 
-  const response = await context.get('/health');
-  expect(response.status()).toBe(200);
+  expect(response).not.toBeNull();
+  expect(response!.status()).toBe(200);
 });
