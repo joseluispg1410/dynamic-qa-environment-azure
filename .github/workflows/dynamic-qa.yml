@@ -47,6 +47,11 @@ jobs:
         run: |
           terraform init
           terraform apply -auto-approve
+          
+      # Optional: Show resources for debug
+      - name: Terraform Show (debug)
+        working-directory: ./terraform
+        run: terraform show
 
       # Run Playwright tests inside a Docker container
       - name: Run Playwright Tests
