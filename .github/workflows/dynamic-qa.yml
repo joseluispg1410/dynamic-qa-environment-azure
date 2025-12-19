@@ -53,8 +53,8 @@ jobs:
         run: |
           docker build -t playwright-tests ./tests
           docker run \
-            -e BASE_URL=${{ steps.terraform.outputs.app_url }} \
-            playwright-tests
+            -e BASE_URL="https://${{ steps.terraform.outputs.app_host }}" \
+             playwright-tests
 
       # Cleanup: destroy Terraform-managed resources
       - name: Terraform Destroy
