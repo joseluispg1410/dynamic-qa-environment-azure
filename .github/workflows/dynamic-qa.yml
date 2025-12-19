@@ -64,4 +64,7 @@ jobs:
       # Cleanup: destroy Terraform-managed resources
       - name: Terraform Destroy
         if: always()  # Always runs even if tests fail
-        run: terraform destroy -auto-approve
+        working-directory: ./terraform
+        run: |
+          terraform init -input=false
+          terraform destroy -auto-approve

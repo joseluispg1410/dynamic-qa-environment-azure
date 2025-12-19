@@ -73,13 +73,14 @@ This ensures:
 
 Before running this demo, make sure you have the following installed:
 
-### **Manual (one-time setup per machine)**
+### **Manual Prerequisites (one-time setup per machine)**
 
 - **Docker Desktop**  
   - Needed to run Playwright tests in a container.  
   - Download: [https://www.docker.com/products/docker-desktop/](https://www.docker.com/products/docker-desktop/)
 
 - **Azure CLI**  
+  - An active Azure subscription is required to provision and destroy cloud resources.
   - Required for Terraform to provision and destroy Azure resources.  
   - Install guide: [https://learn.microsoft.com/en-us/cli/azure/install-azure-cli](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli)  
   - Login before using Terraform:
@@ -90,6 +91,9 @@ Before running this demo, make sure you have the following installed:
 
 - **Terraform**
   - Terraform is required to provision and destroy Azure infrastructure.
+    In CI/CD pipelines, Terraform is executed directly by GitHub Actions runners, so no local installation is required when using the pipeline.
+    If you want to install it anyway, here’s how:
+
    #### Windows
     1. Download Terraform from the official website:  
     https://developer.hashicorp.com/terraform/downloads
@@ -98,12 +102,12 @@ Before running this demo, make sure you have the following installed:
     #```bash
     terraform -version
   
-  #### MacOs
+   #### MacOs
     brew tap hashicorp/tap
     brew install hashicorp/tap/terraform
     terraform -version
 
-  #### Linux
+   #### Linux
     sudo apt-get update && sudo apt-get install -y gnupg software-properties-common
     wget -O- https://apt.releases.hashicorp.com/gpg | \
     gpg --dearmor | \
@@ -114,10 +118,80 @@ Before running this demo, make sure you have the following installed:
     sudo apt-get update && sudo apt-get install terraform
     terraform -version
 
-> In CI/CD pipelines, Terraform is executed directly by GitHub Actions runners, so no local installation is required when using the pipeline.
+   #### 🔐 Azure Authentication for Terraform (CI/CD)
 
+    Terraform requires authentication to Azure in order to provision and destroy resources.  
+    In CI/CD environments (GitHub Actions), authentication is handled using an **Azure Service Principal**.
 
-### Automated (handled inside Docker)
+    > Interactive login (`az login`) is **not used** in pipelines.
+
+    ---
+
+    ### 0. Login to Azure (local, one-time)
+        Before creating the Service Principal, authenticate with Azure:
+            az login
+
+        Run this command to get the subscription_id and copy it:
+            az account list -o table
+
+        If you have multiple subscriptions, select the correct one:
+            az account set --subscription <SUBSCRIPTION_ID>
+    
+        To verify the active subscription:
+            az account show --query id -o tsv
+
+    ### 1. Create an Azure Service Principal (one-time setup)
+        Run the following command locally or in Azure Cloud Shell:
+
+            az ad sp create-for-rbac \
+            --name "github-actions-terraform" \
+            --role Contributor \
+            --scopes /subscriptions/<SUBSCRIPTION_ID> \
+            --sdk-auth
+
+        This command outputs a JSON object containing:
+            - clientId
+            - clientSecret
+            - subscriptionId
+            - tenantId
+
+    ### 2. Create an Azure Service Principal (one-time setup)
+        In your GitHub repository:
+            Settings → Secrets and variables → Actions → New repository secret
+            Create the following secrets using the values from the Service Principal:
+                - AZURE_CLIENT_ID
+                - AZURE_CLIENT_SECRET
+                - AZURE_SUBSCRIPTION_ID
+                - AZURE_TENANT_ID
+        These secrets are securely injected into the GitHub Actions workflow.
+    
+    ### 3. Terraform authentication in GitHub Actions
+        Terraform automatically detects Azure credentials via environment variables.
+        The GitHub Actions workflow sets the following variables:
+            - ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+            - ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+            - ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+            - ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+        With this configuration, Terraform can authenticate with Azure without requiring any manual login.
+
+   #### ⚠️ Azure Provider Registration (for new subscriptions)
+
+    If your Azure subscription is new (for example, a Free Tier account), some services are **not automatically registered**.  
+    Terraform will fail with an error like:
+        MissingSubscriptionRegistration: The subscription is not registered to use namespace 'Microsoft.App'
+        This happens because **Azure Container Apps** require the provider namespace `Microsoft.App` to be registered in your subscription.
+
+        #### ✅ Solution: Register the provider using Azure CLI
+
+        Run the following command **once per subscription, e.g Microsoft.App**:
+            az provider register --namespace Microsoft.App
+        
+        Run and rerun this command and wait until the return be "Registered"
+            az provider show --namespace Microsoft.App --query "registrationState"
+
+        
+
+### Automated Prerequisites (handled inside Docker)
 
 - **Node.js and Playwright**  
   Already included in the Docker image, no local installation needed.
