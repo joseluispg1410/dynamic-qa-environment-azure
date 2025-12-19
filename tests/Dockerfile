@@ -1,5 +1,5 @@
 # Base image with Playwright installed (browsers included)
-FROM mcr.microsoft.com/playwright:v1.41.0-jammy
+FROM mcr.microsoft.com/playwright:v1.57.0-jammy
 
 # Set working directory inside the container
 WORKDIR /app
