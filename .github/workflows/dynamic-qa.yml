@@ -52,18 +52,56 @@ jobs:
 
       - name: Get Terraform outputs
         id: tf-output
-        working-directory: ./terraform   # ajusta ruta
+        working-directory: ./terraform  
         run: |
           echo "APP_URL=$(terraform output -raw app_url)" >> $GITHUB_OUTPUT
 
-      # Run Playwright tests inside a Docker container
+      - name: Wait for app readiness
+        run: |
+          APP_URL="https://${{ steps.tf-output.outputs.APP_URL }}"
+          echo "Waiting for $APP_URL"
+          for i in $(seq 1 30); do
+            code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 5 "$APP_URL" || echo "000")
+            if [ "$code" -eq 200 ]; then
+              echo "App is ready (HTTP 200)"
+              break
+            fi
+            echo "Attempt $i: HTTP $code — sleeping 10s"
+            sleep 10
+          done
+          if [ "$code" != "200" ]; then
+            echo "App not ready after 30 attempts"
+            curl -v "$APP_URL" || true
+            exit 1
+          fi
+
+      # Run Playwright tests inside Docker with Allure results
       - name: Run Playwright Tests
         run: |
           echo "BASE_URL=https://${{ steps.tf-output.outputs.APP_URL }}"
           docker build -t playwright-tests ./tests
           docker run \
             -e BASE_URL="https://${{ steps.tf-output.outputs.APP_URL }}" \
-             playwright-tests
+            -v ${{ github.workspace }}/allure-results:/tests/allure-results \
+            playwright-tests
+
+      # Generate Allure report (outside the container)
+      - name: Generate Allure report
+        if: always()
+        run: |
+          npm install -D allure-commandline
+          npx allure generate allure-results --clean -o allure-report
+
+      # Publish Allure report to GitHub Pages
+      - name: Deploy Allure to GitHub Pages
+        if: always()
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: allure-report
+          publish_branch: gh-pages
+          user_name: "github-actions"
+          user_email: "github-actions@github.com"
 
       # Cleanup: destroy Terraform-managed resources
       - name: Terraform Destroy
