@@ -8,6 +8,8 @@ name: Dynamic QA Environment
 on:
   workflow_dispatch:
   pull_request:
+    branches:
+        - main
 
 jobs:
   qa:
