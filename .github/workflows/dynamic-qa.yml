@@ -46,9 +46,13 @@ jobs:
         run: |
           terraform init
           terraform apply -auto-approve
-          # Capturar output de Terraform correctamente
-          APP_URL=$(terraform output -raw app_url | tr -d '\r\n')
-          # Guardar en GitHub Actions de forma segura
+      
+          # Capturar output de Terraform en JSON y extraer app_url
+          APP_URL=$(terraform output -json | jq -r '.app_url.value')
+      
+          echo "DEBUG_APP_URL=$APP_URL"
+          
+          # Guardar de forma segura como output de GitHub Actions
           echo "app_url=$APP_URL" >> $GITHUB_OUTPUT
 
       # Mostrar URL en logs
