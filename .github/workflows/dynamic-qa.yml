@@ -48,7 +48,7 @@ jobs:
         run: |
           terraform init
           terraform apply -auto-approve
-          # Guardar output de Terraform en GitHub Actions
+          # Obtener output limpio
           APP_URL=$(terraform output -raw app_url)
           echo "app_url=$APP_URL" >> $GITHUB_OUTPUT
 
