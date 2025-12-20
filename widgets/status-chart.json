@@ -1,1 +1,1 @@
-[]
+[{"uid":"42867fcd495e8437","name":"Homepage loads","time":{"start":1766262577976,"stop":1766262578899,"duration":923},"status":"passed","severity":"normal"},{"uid":"c9ad6ff905c06e5c","name":"Homepage contain subtext","time":{"start":1766262577975,"stop":1766262578866,"duration":891},"status":"passed","severity":"normal"},{"uid":"8abc8af82aa93104","name":"Homepage loads with code 200","time":{"start":1766262578900,"stop":1766262579558,"duration":658},"status":"passed","severity":"normal"}]
