@@ -1,4 +1,4 @@
 "DESCRIPTION","DURATION IN MS","NAME","PARENT SUITE","START TIME","STATUS","STOP TIME","SUB SUITE","SUITE","TEST CLASS","TEST METHOD"
-"","923","Homepage loads","","2025-12-20","passed","2025-12-20","","tests/ui.spec.ts","",""
-"","891","Homepage contain subtext","","2025-12-20","passed","2025-12-20","","tests/check_subtext.test.ts","",""
-"","658","Homepage loads with code 200","","2025-12-20","passed","2025-12-20","","tests/ui.spec.ts","",""
+"","903","Homepage contain subtext","","2025-12-20","passed","2025-12-20","","tests/check_subtext.test.ts","",""
+"","899","Homepage loads","","2025-12-20","passed","2025-12-20","","tests/ui.spec.ts","",""
+"","581","Homepage loads with code 200","","2025-12-20","passed","2025-12-20","","tests/ui.spec.ts","",""
