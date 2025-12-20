@@ -45,17 +45,21 @@ jobs:
         working-directory: ./terraform
         run: |
           terraform init
-          terraform apply -auto-approve
 
-          # Obtener output en bruto (sin comillas ni saltos de línea)
-          # Preferimos -raw cuando está disponible (Terraform >= 0.14)
-          APP_URL_RAW=$(terraform output -raw app_url 2>/dev/null || terraform output app_url 2>/dev/null || true)
+          # Run apply and capture full stdout/stderr to a file to parse Outputs: block
+          terraform apply -auto-approve 2>&1 | tee tf_apply_output.txt
 
-          # Extraer el último token que contenga el dominio de container apps
-          # Esto elimina prefijos de log como "[command]/home/.../terraform-bin output -raw app_url"
-          APP_URL=$(echo "$APP_URL_RAW" | tr -d '\r\n' | awk '{print $NF}')
+          # Attempt to parse the Outputs: block emitted by 'terraform apply'
+          # Expected line: app_url = "your-hostname"
+          APP_URL=$(awk -F'= ' '/^app_url[ \t]*=/{gsub(/"/, "", $2); print $2; exit}' tf_apply_output.txt || true)
 
-          echo "DEBUG_APP_URL_RAW=$APP_URL_RAW"
+          # Fallback: use terraform output -raw (preferred) or terraform output
+          if [ -z "$APP_URL" ]; then
+            APP_URL=$(terraform output -raw app_url 2>/dev/null || terraform output app_url 2>/dev/null || true)
+            # Clean and take last token if any stray prefix exists
+            APP_URL=$(echo "$APP_URL" | tr -d '\r\n' | awk '{print $NF}')
+          fi
+
           echo "DEBUG_APP_URL_PARSED=$APP_URL"
 
           # Guardar en GitHub Actions como output de paso
