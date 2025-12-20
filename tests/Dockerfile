@@ -2,7 +2,7 @@
 FROM mcr.microsoft.com/playwright:v1.57.0-jammy
 
 # Set working directory inside the container
-WORKDIR /app
+WORKDIR /tests
 
 # Copy package files and install dependencies
 COPY package.json package-lock.json ./
