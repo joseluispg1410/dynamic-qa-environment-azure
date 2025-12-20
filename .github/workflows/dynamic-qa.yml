@@ -49,12 +49,14 @@ jobs:
 
           # Obtener output en bruto (sin comillas ni saltos de línea)
           # Preferimos -raw cuando está disponible (Terraform >= 0.14)
-          APP_URL=$(terraform output -raw app_url 2>/dev/null || terraform output app_url)
+          APP_URL_RAW=$(terraform output -raw app_url 2>/dev/null || terraform output app_url 2>/dev/null || true)
 
-          # Limpiar retornos de carro y saltos de línea
-          APP_URL=$(echo "$APP_URL" | tr -d '\r\n')
+          # Extraer el último token que contenga el dominio de container apps
+          # Esto elimina prefijos de log como "[command]/home/.../terraform-bin output -raw app_url"
+          APP_URL=$(echo "$APP_URL_RAW" | tr -d '\r\n' | awk '{print $NF}')
 
-          echo "DEBUG_APP_URL=$APP_URL"
+          echo "DEBUG_APP_URL_RAW=$APP_URL_RAW"
+          echo "DEBUG_APP_URL_PARSED=$APP_URL"
 
           # Guardar en GitHub Actions como output de paso
           echo "app_url=$APP_URL" >> $GITHUB_OUTPUT
