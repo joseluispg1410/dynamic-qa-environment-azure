@@ -46,10 +46,10 @@ jobs:
         run: |
           terraform init
           terraform apply -auto-approve
-          
-          # Obtener output limpio de Terraform
-          APP_URL=$(terraform output -raw app_url)
-          echo "app_url=$APP_URL" >> $GITHUB_OUTPUT
+          # Obtener output limpio y eliminar saltos de línea
+          APP_URL=$(terraform output -raw app_url | tr -d '\n' | tr -d '\r')
+          # Escapar caracteres problemáticos (especialmente los :)
+          printf "app_url=%s\n" "$APP_URL" >> $GITHUB_OUTPUT
 
       # Mostrar URL en logs
       - name: Mostrar URL
