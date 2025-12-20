@@ -11,6 +11,6 @@ test('Homepage loads', async ({ page }) => {
 // Simple smoke test for homepage
 test('Homepage loads with code 200', async ({ page }) => {
   const response = await page.goto('/'); // usa baseURL del config
-  // compruebas el status de la respuesta
+  // check the status of the response
   expect(response?.status()).toBe(200);
 });
