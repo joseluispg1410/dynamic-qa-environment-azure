@@ -48,7 +48,6 @@ jobs:
         run: |
           terraform init
           terraform apply -auto-approve
-          echo "app_url=$(terraform output -raw app_url)" >> $GITHUB_OUTPUT
 
       # Run Playwright tests inside a Docker container
       - name: Run Playwright Tests
