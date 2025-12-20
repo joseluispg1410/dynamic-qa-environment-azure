@@ -7,3 +7,10 @@ test('Homepage loads', async ({ page }) => {
   const elemento = page.locator('#titleText');
   await expect(elemento).toHaveText('Your Azure Container Apps app is live');
 });
+
+// Simple smoke test for homepage
+test('Homepage loads with code 200', async ({ page }) => {
+  const response = await page.goto('/'); // usa baseURL del config
+  // compruebas el status de la respuesta
+  expect(response?.status()).toBe(200);
+});
