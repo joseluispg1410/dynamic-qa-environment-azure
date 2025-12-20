@@ -102,6 +102,7 @@ jobs:
           publish_branch: gh-pages
           user_name: "github-actions"
           user_email: "github-actions@github.com"
+          allow_empty_commit: true
 
       # Cleanup: destroy Terraform-managed resources
       - name: Terraform Destroy
