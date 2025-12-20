@@ -50,13 +50,19 @@ jobs:
           terraform init
           terraform apply -auto-approve
 
+      - name: Get Terraform outputs
+        id: tf-output
+        working-directory: ./terraform   # ajusta ruta
+        run: |
+          echo "APP_URL=$(terraform output -raw app_url)" >> $GITHUB_OUTPUT
+
       # Run Playwright tests inside a Docker container
       - name: Run Playwright Tests
         run: |
-          echo "BASE_URL=https://${{ steps.terraform.outputs.app_url }}"
+          echo "BASE_URL=https://${{ steps.tf-output.outputs.APP_URL }}"
           docker build -t playwright-tests ./tests
           docker run \
-            -e BASE_URL="https://${{ steps.terraform.outputs.app_url }}" \
+            -e BASE_URL="https://${{ steps.tf-output.outputs.APP_URL }}" \
              playwright-tests
 
       # Cleanup: destroy Terraform-managed resources
