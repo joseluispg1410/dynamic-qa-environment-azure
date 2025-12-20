@@ -4,6 +4,7 @@
 
 name: Dynamic QA Environment
 
+# Trigger the workflow manually or on PRs
 on:
   workflow_dispatch:
   pull_request:
@@ -12,26 +13,27 @@ jobs:
   qa:
     runs-on: ubuntu-latest
 
+    # Environment variables shared across steps
     env:
-      TF_VAR_env_name: qa-${{ github.run_id }}
+      TF_VAR_env_name: qa-${{ github.run_id }} # Unique QA environment name
       ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
       ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
       ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
       ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
 
     steps:
-      # Checkout repository
+      # Checkout repo
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Debug workspace
+      # Debug Workspace
       - name: Debug workspace
         run: |
-          echo "workspace=$GITHUB_WORKSPACE"
-          pwd
-          ls -la
-          ls -la ./terraform || true
-          find . -maxdepth 2 -name "*.tf" -print
+         echo "workspace=$GITHUB_WORKSPACE"
+         pwd
+         ls -la
+         ls -la ./terraform || true
+         find . -maxdepth 2 -name "*.tf" -print
 
       # Setup Terraform
       - name: Setup Terraform
@@ -39,48 +41,27 @@ jobs:
         with:
           terraform_version: 1.5.0
 
-      # Initialize and apply Terraform
+      # Initialize and apply Terraform to provision infra
       - name: Terraform Init & Apply
         id: terraform
         working-directory: ./terraform
         run: |
           terraform init
+          terraform apply -auto-approve
+          echo "app_url=$(terraform output -raw app_url)" >> $GITHUB_OUTPUT
 
-          # Run apply and capture full stdout/stderr to a file to parse Outputs: block
-          terraform apply -auto-approve 2>&1 | tee tf_apply_output.txt
-
-          # Attempt to parse the Outputs: block emitted by 'terraform apply'
-          # Expected line: app_url = "your-hostname"
-          APP_URL=$(awk -F'= ' '/^app_url[ \t]*=/{gsub(/"/, "", $2); print $2; exit}' tf_apply_output.txt || true)
-
-          # Fallback: use terraform output -raw (preferred) or terraform output
-          if [ -z "$APP_URL" ]; then
-            APP_URL=$(terraform output -raw app_url 2>/dev/null || terraform output app_url 2>/dev/null || true)
-            # Clean and take last token if any stray prefix exists
-            APP_URL=$(echo "$APP_URL" | tr -d '\r\n' | awk '{print $NF}')
-          fi
-
-          echo "DEBUG_APP_URL_PARSED=$APP_URL"
-
-          # Guardar en GitHub Actions como output de paso
-          echo "app_url=$APP_URL" >> $GITHUB_OUTPUT
-
-      # Mostrar URL en logs
-      - name: Mostrar URL
-        run: echo "BASE_URL=https://${{ steps.terraform.outputs.app_url }}"
-
-      # Run Playwright tests inside Docker
+      # Run Playwright tests inside a Docker container
       - name: Run Playwright Tests
         run: |
-          echo "Ejecutando Playwright con BASE_URL=https://${{ steps.terraform.outputs.app_url }}"
+          echo "BASE_URL=https://${{ steps.terraform.outputs.app_url }}"
           docker build -t playwright-tests ./tests
           docker run \
             -e BASE_URL="https://${{ steps.terraform.outputs.app_url }}" \
-            playwright-tests
+             playwright-tests
 
       # Cleanup: destroy Terraform-managed resources
       - name: Terraform Destroy
-        if: always()
+        if: always()  # Always runs even if tests fail
         working-directory: ./terraform
         run: |
           terraform init -input=false
