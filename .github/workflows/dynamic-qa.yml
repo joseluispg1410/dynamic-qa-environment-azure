@@ -47,12 +47,15 @@ jobs:
           terraform init
           terraform apply -auto-approve
       
-          # Capturar output de Terraform en JSON y extraer app_url
-          APP_URL=$(terraform output -json | jq -r '.app_url.value')
+          # Guardar output en archivo
+          terraform output app_url > app_url.txt
+      
+          # Leer el archivo y limpiar saltos de línea
+          APP_URL=$(cat app_url.txt | tr -d '\r\n')
       
           echo "DEBUG_APP_URL=$APP_URL"
-          
-          # Guardar de forma segura como output de GitHub Actions
+      
+          # Guardar en GitHub Actions
           echo "app_url=$APP_URL" >> $GITHUB_OUTPUT
 
       # Mostrar URL en logs
