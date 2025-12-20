@@ -43,24 +43,18 @@ jobs:
 
       # Initialize and apply Terraform to provision infra
       - name: Terraform Init & Apply
-        id: terraform
         working-directory: ./terraform
         run: |
           terraform init
           terraform apply -auto-approve
-          # Capture the app URL output (expects an output named `app_url`)
-          app_url=$(terraform output -raw app_url || true)
-          echo "APP_URL=$app_url" >> $GITHUB_ENV
 
       # Run Playwright tests inside a Docker container
       - name: Run Playwright Tests
-        env:
-          # Use APP_URL exported from the previous step (set via GITHUB_ENV)
-          BASE_URL: ${{ env.APP_URL }}
         run: |
+          echo "BASE_URL=https://${{ steps.terraform.outputs.app_url }}"
           docker build -t playwright-tests ./tests
           docker run \
-            -e BASE_URL="$BASE_URL" \
+            -e BASE_URL="https://${{ steps.terraform.outputs.app_url }}" \
              playwright-tests
 
       # Cleanup: destroy Terraform-managed resources
