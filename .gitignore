@@ -11,6 +11,7 @@ npm-debug.log
 # Playwright
 playwright-report/
 test-results/
+results.xml
 
 # OS
 .DS_Store
