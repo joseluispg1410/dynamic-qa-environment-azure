@@ -46,15 +46,14 @@ jobs:
         run: |
           terraform init
           terraform apply -auto-approve
-          # Obtener output limpio y eliminar saltos de línea
-          APP_URL=$(terraform output -raw app_url | tr -d '\n' | tr -d '\r')
-          # Escapar caracteres problemáticos (especialmente los :)
-          printf "app_url=%s\n" "$APP_URL" >> $GITHUB_OUTPUT
+          # Capturar output de Terraform correctamente
+          APP_URL=$(terraform output -raw app_url | tr -d '\r\n')
+          # Guardar en GitHub Actions de forma segura
+          echo "app_url=$APP_URL" >> $GITHUB_OUTPUT
 
       # Mostrar URL en logs
       - name: Mostrar URL
-        run: |
-          echo "BASE_URL=https://${{ steps.terraform.outputs.app_url }}"
+        run: echo "BASE_URL=https://${{ steps.terraform.outputs.app_url }}"
 
       # Run Playwright tests inside Docker
       - name: Run Playwright Tests
