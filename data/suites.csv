@@ -1,0 +1,3 @@
+"DESCRIPTION","DURATION IN MS","NAME","PARENT SUITE","START TIME","STATUS","STOP TIME","SUB SUITE","SUITE","TEST CLASS","TEST METHOD"
+"","826","Homepage contain subtext","","2025-12-20","passed","2025-12-20","","tests/check_subtext.test.ts","",""
+"","959","Homepage loads","","2025-12-20","passed","2025-12-20","","tests/ui.spec.ts","",""

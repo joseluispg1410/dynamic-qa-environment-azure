@@ -1,1 +1,1 @@
-[]
+[{"uid":"a1cb2dc52d3eed90","name":"Homepage loads","time":{"start":1766250530842,"stop":1766250531801,"duration":959},"status":"passed","severity":"normal"},{"uid":"d22104bda8d0aedd","name":"Homepage contain subtext","time":{"start":1766250530841,"stop":1766250531667,"duration":826},"status":"passed","severity":"normal"}]
