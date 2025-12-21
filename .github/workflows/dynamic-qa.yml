@@ -77,6 +77,14 @@ jobs:
             exit 1
           fi
 
+        # Comment on PR with direct link to the report
+      - name: Comment PR with App URL
+        if: always() && github.event_name == 'pull_request'
+        uses: thollander/actions-comment-pull-request@v2
+        with:
+          message: |            
+            💻 App URL: https://${{ steps.tf-output.outputs.APP_URL }}
+
       # Run Playwright tests inside Docker with Allure results
       - name: Run Playwright Tests
         run: |
@@ -95,27 +103,29 @@ jobs:
           npx allure generate allure-results --clean -o allure-report
 
       # Upload Allure like Artifact (URL única por run)
-      - name: Upload Allure Report Artifact
+      - name: Deploy Allure to GitHub Pages (per run folder)
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: peaceiris/actions-gh-pages@v4
         with:
-          name: allure-report-${{ github.run_number }}-${{ github.run_id }}
-          path: allure-report/
-          retention-days: 30  # 30 days, ajusta según needs
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: allure-report
+          publish_branch: gh-pages
+          destination_dir: runs/${{ github.run_id }}   # <- clave
+          user_name: "github-actions"
+          user_email: "github-actions@github.com"
+          keep_files: true         
 
-      # Comment en PR con link directo al reporte
-      - name: Comment PR with Allure link
+      # Comment on PR with direct link to the report
+      - name: Comment PR with Allure Pages link
         if: always() && github.event_name == 'pull_request'
         uses: thollander/actions-comment-pull-request@v2
         with:
           message: |
             📊 **Allure Report #${{ github.run_number }}**
-            [Abrir reporte](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}#artifacts)
+            [Abrir reporte](https://joseluispg1410.github.io/dynamic-qa-environment-azure/runs/${{ github.run_id }}/)
             
             🟢 Tests: ${{ job.status == 'success' && '✅ PASSED' || '❌ FAILED' }}
             
-            💻 App URL: https://${{ steps.tf-output.outputs.APP_URL }}
-
       # Cleanup: destroy Terraform-managed resources
       - name: Terraform Destroy
         if: always()  # Always runs even if tests fail
