@@ -77,6 +77,14 @@ jobs:
             exit 1
           fi
 
+        # Comment on PR with direct link to the report
+      - name: Comment PR with App URL
+        if: always() && github.event_name == 'pull_request'
+        uses: thollander/actions-comment-pull-request@v2
+        with:
+          message: |            
+            💻 App URL: https://${{ steps.tf-output.outputs.APP_URL }}
+
       # Run Playwright tests inside Docker with Allure results
       - name: Run Playwright Tests
         run: |
@@ -118,8 +126,6 @@ jobs:
             
             🟢 Tests: ${{ job.status == 'success' && '✅ PASSED' || '❌ FAILED' }}
             
-            💻 App URL: https://${{ steps.tf-output.outputs.APP_URL }}
-
       # Cleanup: destroy Terraform-managed resources
       - name: Terraform Destroy
         if: always()  # Always runs even if tests fail
