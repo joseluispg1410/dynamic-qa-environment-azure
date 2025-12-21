@@ -85,7 +85,7 @@ jobs:
           message: |            
             💻 App URL: https://${{ steps.tf-output.outputs.APP_URL }}
       
-      - name: Log App URL (manual run)
+      - name: Log App URL
         if: always() && github.event_name == 'workflow_dispatch'
         run: |
           echo "💻 App URL: https://${{ steps.tf-output.outputs.APP_URL }}"
@@ -131,7 +131,7 @@ jobs:
             
             🟢 Tests: ${{ job.status == 'success' && '✅ PASSED' || '❌ FAILED' }}
 
-      - name: Log App URL (manual run)
+      - name: Log Allure Pages link
         if: always() && github.event_name == 'workflow_dispatch'
         run: |
           echo "📊 **Allure Report #${{ github.run_number }}**
