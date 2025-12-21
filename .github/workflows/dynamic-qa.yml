@@ -94,17 +94,27 @@ jobs:
           npm install -D allure-commandline
           npx allure generate allure-results --clean -o allure-report
 
-      # Publish Allure report to GitHub Pages
-      - name: Deploy Allure to GitHub Pages
+      # Upload Allure like Artifact (URL única por run)
+      - name: Upload Allure Report Artifact
         if: always()
-        uses: peaceiris/actions-gh-pages@v4
+        uses: actions/upload-artifact@v4
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: allure-report
-          publish_branch: gh-pages
-          user_name: "github-actions"
-          user_email: "github-actions@github.com"
-          allow_empty_commit: true
+          name: allure-report-${{ github.run_number }}-${{ github.run_id }}
+          path: allure-report/
+          retention-days: 30  # 30 days, ajusta según needs
+
+      # Comment en PR con link directo al reporte
+      - name: Comment PR with Allure link
+        if: always() && github.event_name == 'pull_request'
+        uses: thollander/actions-comment-pull-request@v2
+        with:
+          message: |
+            📊 **Allure Report #${{ github.run_number }}**
+            [Abrir reporte](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}#artifacts)
+            
+            🟢 Tests: ${{ job.status == 'success' && '✅ PASSED' || '❌ FAILED' }}
+            
+            💻 App URL: https://${{ steps.tf-output.outputs.APP_URL }}
 
       # Cleanup: destroy Terraform-managed resources
       - name: Terraform Destroy
