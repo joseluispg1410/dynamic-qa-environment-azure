@@ -84,6 +84,11 @@ jobs:
         with:
           message: |            
             💻 App URL: https://${{ steps.tf-output.outputs.APP_URL }}
+      
+      - name: Log App URL (manual run)
+        if: always() && github.event_name == 'workflow_dispatch'
+        run: |
+          echo "💻 App URL: https://${{ steps.tf-output.outputs.APP_URL }}"
 
       # Run Playwright tests inside Docker with Allure results
       - name: Run Playwright Tests
@@ -125,6 +130,14 @@ jobs:
             [Abrir reporte](https://joseluispg1410.github.io/dynamic-qa-environment-azure/runs/${{ github.run_id }}/)
             
             🟢 Tests: ${{ job.status == 'success' && '✅ PASSED' || '❌ FAILED' }}
+
+      - name: Log App URL (manual run)
+        if: always() && github.event_name == 'workflow_dispatch'
+        run: |
+          echo "📊 **Allure Report #${{ github.run_number }}**
+            [Abrir reporte](https://joseluispg1410.github.io/dynamic-qa-environment-azure/runs/${{ github.run_id }}/)
+            
+            🟢 Tests: ${{ job.status == 'success' && '✅ PASSED' || '❌ FAILED' }}"
             
       # Cleanup: destroy Terraform-managed resources
       - name: Terraform Destroy
