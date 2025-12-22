@@ -42,15 +42,17 @@ dynamic-qa-environment-azure/
 Benefits: reproducible ephemeral environments, cost control, consistent CI results.
 ## Recommended test method (GitHub Actions)
 
-We recommend running the workflow on GitHub as the primary way to test this project. To run it:
+The repository workflow is named **Dynamic QA Environment**. Important: external contributors (users without repository collaborator permissions) cannot use the **Run workflow** button to start a manual run. Instead, to test this project from an external fork or by external reviewers, follow one of these approaches:
+
+- Create a Pull Request against the repository's default branch (e.g., `main`). The workflow is configured to run on pull request events and will start automatically.
+- Repository collaborators with permission can still run the workflow manually from the **Actions** tab by selecting **Dynamic QA Environment** and clicking **Run workflow**.
+
+To view results:
 
 - Open the repository on GitHub and go to the **Actions** tab.
-- Select the workflow named **Dynamic QA Environment** (file: `.github/workflows/dynamic-qa.yml`).
-- Click **Run workflow** (this uses `workflow_dispatch`) to launch a manual run.
+- Select the **Dynamic QA Environment** and then **qa** workflow and open the latest run to see logs, job steps and any published artifacts (HTML report, JUnit results).
 
-You can monitor progress and view logs on the workflow run page in **Actions**. Test reports (HTML and JUnit) are published by the workflow as artifacts or may be published to GitHub Pages depending on the repository configuration.
-
-If you prefer to run tests locally, follow the **Prerequisites** and the local steps below.
+If you prefer to run tests locally instead of using GitHub Actions, follow the **Prerequisites** and local steps below.
 
 ## Prerequisites
 Before running the demo locally you should have the following installed (CI runners already provide most tools):
