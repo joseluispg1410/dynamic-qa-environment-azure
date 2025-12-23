@@ -1,5 +1,10 @@
 ## 🎥 Demo en vídeo
-https://github.com/joseluispg1410/dynamic-qa-environment-azure/releases/download/v1.0/Demo.video.mov
+
+👉 **Ver online (streaming):**  
+🔗 https://drive.google.com/file/d/1tTUOqnFkKeK2xtxSaQQC3zWTnZWPMd_e/view?usp=drive_link
+
+👉 **Descargar versión original (MP4, 600 MB):**  
+🔗 https://github.com/joseluispg1410/dynamic-qa-environment-azure/releases/download/v1.0/Demo.video.mov
 
 # Dynamic QA Environment on Azure
 This repository demonstrates a reproducible, ephemeral QA environment on Azure using Terraform, GitHub Actions and Playwright tests running in Docker. It is designed to provision a temporary test environment, run UI/API tests, and tear down all resources automatically.
