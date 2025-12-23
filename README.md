@@ -1,9 +1,9 @@
 ## 🎥 Demo en vídeo
 
-👉 **Ver online (streaming):**  
+👉 **View online (Google Drive):**  
 🔗 https://drive.google.com/file/d/1tTUOqnFkKeK2xtxSaQQC3zWTnZWPMd_e/view?usp=drive_link
 
-👉 **Descargar versión original (MP4, 600 MB):**  
+👉 **Download original version (MP4, 600 MB):**  
 🔗 https://github.com/joseluispg1410/dynamic-qa-environment-azure/releases/download/v1.0/Demo.video.mov
 
 # Dynamic QA Environment on Azure
